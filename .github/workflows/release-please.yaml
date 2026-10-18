@@ -1,0 +1,97 @@
+# Opens and maintains a release pull request from Conventional Commits on main. Merging the release
+# pull request bumps package.json, updates CHANGELOG.md, creates the vX.Y.Z tag and GitHub release,
+# and publishes the package to npmjs.org.
+#
+# Publishing uses npm trusted publishing (OIDC): no npm token is stored in this repository. The
+# package's trusted publisher on npmjs.com must name this repository and this workflow file
+# (release-please.yaml). See "Releases" in README.md.
+#
+# Third-party actions are pinned to commit SHAs. To resolve a tag:
+#   git ls-remote https://github.com/<owner>/<repo>.git refs/tags/<version>
+name: Release Please
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-please
+  cancel-in-progress: false
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - name: Run Release Please
+        id: release
+        uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  publish:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Required for npm trusted publishing (OIDC) and provenance.
+      id-token: write
+    steps:
+      - name: Check out release tag
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.release-please.outputs.tag_name }}
+          persist-credentials: false
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          registry-url: https://registry.npmjs.org
+
+      - name: Check npm version
+        # Trusted publishing requires npm 11.5.1 or later.
+        run: |
+          set -euo pipefail
+          npm --version
+          node -e "const [major, minor, patch] = process.argv[1].split('.').map(Number); process.exit(major > 11 || (major === 11 && (minor > 5 || (minor === 5 && patch >= 1))) ? 0 : 1)" "$(npm --version)" \
+            || { echo "::error::npm 11.5.1 or later is required for trusted publishing"; exit 1; }
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Test
+        run: pnpm test
+
+      # Also validates the package with publint and arethetypeswrong (see tsdown.config.ts).
+      - name: Build
+        run: pnpm run build
+
+      - name: Publish to npmjs.org
+        run: |
+          set -euo pipefail
+          name="$(node -p "require('./package.json').name")"
+          version="$(node -p "require('./package.json').version")"
+
+          # Lets a failed run be re-run, and skips a version that was published manually.
+          if npm view "${name}@${version}" version > /dev/null 2>&1; then
+            echo "${name}@${version} is already published; skipping."
+            exit 0
+          fi
+
+          npm publish

@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Tests and tool configs are not published, so they do not need isolated declarations.
+    "isolatedDeclarations": false,
+    "declaration": false
+  },
+  "include": ["src", "tests", "*.ts"]
+}

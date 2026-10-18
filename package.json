@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json.schemastore.org/package",
+  "name": "@dts-stn/react-router-i18n-routes",
+  "version": "1.0.0",
+  "description": "Type-safe, translated (i18n) route definitions for React Router (framework mode).",
+  "keywords": [
+    "i18n",
+    "react-router",
+    "routes",
+    "translation",
+    "typescript"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/STN-DTS/react-router-i18n-routes#readme",
+  "bugs": {
+    "url": "https://github.com/STN-DTS/react-router-i18n-routes/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/STN-DTS/react-router-i18n-routes.git"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js"
+    },
+    "./route-config": {
+      "types": "./dist/route-config.d.ts",
+      "import": "./dist/route-config.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "CHANGELOG.md",
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "format:check": "oxfmt --check .",
+    "format:write": "oxfmt --write .",
+    "lint:check": "oxlint .",
+    "lint:write": "oxlint --fix .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json"
+  },
+  "peerDependencies": {
+    "@react-router/dev": "^7.0.0 || ^8.0.0",
+    "react": ">=18.0.0",
+    "react-router": "^7.0.0 || ^8.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@react-router/dev": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
+  },
+  "packageManager": "pnpm@12.1.0",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/core": "^0.18.5",
+    "@react-router/dev": "^8.4.0",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "jsdom": "^30.1.2",
+    "oxfmt": "^0.72.0",
+    "oxlint": "^1.88.0",
+    "oxlint-tsgolint": "^7.0.2004",
+    "publint": "^0.3.25",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router": "^8.4.0",
+    "tsdown": "^0.23.1",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.4"
+  }
+}

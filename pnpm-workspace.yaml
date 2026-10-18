@@ -1,0 +1,25 @@
+# Single-package repository: this file only holds pnpm settings.
+# https://pnpm.io/settings
+
+# Do not run dependency install scripts unless explicitly allowed.
+# https://pnpm.io/settings#allowbuilds
+allowBuilds:
+  esbuild: false
+
+# Prevents transitive dependencies from pulling code from git repos or tarball URLs.
+# https://pnpm.io/settings#blockexoticsubdeps
+blockExoticSubdeps: true
+
+# Delays installation of newly published packages by 3 days (4320 minutes).
+# https://pnpm.io/settings#minimumreleaseage
+minimumReleaseAge: 4320
+
+# Fails installation if a package's trust level has decreased compared to previous releases.
+# https://pnpm.io/settings#trustpolicy
+trustPolicy: no-downgrade
+
+# Packages excluded from the trust policy checks.
+# https://pnpm.io/settings#trustpolicyexclude
+trustPolicyExclude:
+  - 'chokidar@4.0.3' # See https://github.com/paulmillr/chokidar/issues/1440
+  - 'semver@6.3.1' # See https://github.com/npm/node-semver/issues/838
